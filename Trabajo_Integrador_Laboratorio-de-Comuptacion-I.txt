@@ -28,8 +28,10 @@ diferentes medios (efectivo, tarjeta, etc.).
 
 create database Salon_Belleza
 go
+
 use Salon_Belleza
 go
+
 create table Tipos_Documentos(
 id_tipo_doc int identity(1,1),
 nombre_doc varchar(40) not null,
@@ -96,6 +98,7 @@ create table Tipos_Servicios(
 id_tipo_servicio int,
 servicio varchar(50),
 constraint pk_tipos_servicios primary key (id_tipo_servicio))
+
 create table Servicios(
 id_servicio int,
 id_tipo_servicio int,
@@ -282,6 +285,8 @@ VALUES ('Cordoba', 1),
 ('La Banda',23),
 ('Termas de Rio Hondo',23),
 ('Añatuya',23)
+
+
 INSERT INTO BARRIOS(barrio, id_localidad)
 VALUES ('Centro', 1),
 ('General Paz', 1),

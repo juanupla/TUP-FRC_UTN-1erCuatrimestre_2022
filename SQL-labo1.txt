@@ -1,0 +1,991 @@
+/*--Enunciado N° 2: Salón de belleza
+
+Un prestigioso salón de belleza, ubicado en un centro comercial muy
+concurrido, cuenta con una gran clientela de la provincia.
+Cuando un cliente ingresa es atendido por la recepcionista, que luego de
+verificar o dar ingreso a sus datos personales, le asigna un profesional quién
+será el responsable de toda su atención.
+Los tipos de servicios que ofrece son: peluquería (cortes, peinados, reflejos
+tintura, etc), tratamientos faciales (limpieza, maquillajes, etc); y depilación
+(facial, piernas, etc.), tratamientos corporales, etc. Cada cliente puede
+realizarse varios servicios, por ejemplo, corte, peinado y maquillaje. Antes
+de retirarse la recepcionista entrega la Factura, donde se detallan los
+servicios y el profesional responsable. El pago podrá ser realizado por
+diferentes medios (efectivo, tarjeta, etc.).
+
+--*/
+
+
+
+
+
+
+
+
+
+
+
+
+create database Salon_Belleza
+go
+use Salon_Belleza
+go
+create table Tipos_Documentos(
+id_tipo_doc int identity(1,1),
+nombre_doc varchar(40) not null,
+constraint pk_tipos_documentos primary key (id_tipo_doc))
+
+create table Provincias(
+id_provincia int identity(1,1),
+provincia varchar(40),
+constraint pk_provincias primary key (id_provincia))
+
+create table Localidades(
+id_localidad int identity(1,1),
+localidad varchar(40),
+id_provincia int,
+constraint pk_localidades primary key (id_localidad),
+constraint fk_localidades_Provincias foreign key (id_provincia)
+references Provincias (id_provincia))
+
+create table Barrios(
+id_barrio int identity(1,1),
+barrio varchar(30),
+id_localidad int,
+constraint pk_barrios primary key (id_barrio),
+constraint fk_barrios_localidades foreign key (id_localidad)
+references Localidades (id_localidad))
+
+create table Generos(
+id_genero int identity(1,1),
+genero varchar(50),
+constraint pk_generos primary key (id_genero))
+
+create table Clientes(
+id_cliente int,
+id_genero int,
+nombre varchar(30) not null,
+apellido varchar(30) not null,
+fecha_nac datetime,
+id_tipo_doc int,
+nro_doc int not null,
+id_barrio int,
+direccion varchar(50),
+email varchar(50),
+constraint pk_clientes primary key (id_cliente),
+constraint fk_clientes_generos foreign key (id_genero)
+references Generos (id_genero),
+constraint fk_clientes_tipos_doc foreign key (id_tipo_doc)
+references Tipos_Documentos (id_tipo_doc),
+constraint fk_clientes_barrios foreign key (id_barrio)
+references Barrios (id_barrio))
+
+create table Profesionales(
+id_profesional int,
+nombre varchar(30) not null,
+apellido varchar(30) not null,
+fecha_nac datetime,
+id_tipo_doc int,
+nro_doc int not null,
+puesto varchar (50),
+constraint pk_profesioales primary key (id_profesional),
+constraint fk_profesionales_tipos_doc foreign key (id_tipo_doc)
+references Tipos_Documentos (id_tipo_doc))
+
+create table Tipos_Servicios(
+id_tipo_servicio int,
+servicio varchar(50),
+constraint pk_tipos_servicios primary key (id_tipo_servicio))
+create table Servicios(
+id_servicio int,
+id_tipo_servicio int,
+servicio varchar(50),
+precio decimal(10,2),
+constraint pk_servicios primary key (id_servicio),
+constraint fk_servicios_tipos_servicios foreign key(id_tipo_servicio)
+references Tipos_Servicios (id_tipo_servicio))
+
+create table Tipos_Facturas(
+id_tipo_factura int,
+tipo_factura varchar(50),
+constraint pk_tipos_facturas primary key (id_tipo_factura))
+
+create table Facturas(
+id_factura int,
+id_tipo_factura int,
+fecha datetime,
+numero_factura int,
+id_cliente int,
+constraint pk_facturas primary key (id_factura),
+constraint fk_facturas_tipos_facturas foreign key (id_tipo_factura)
+references Tipos_Facturas (id_tipo_factura),
+constraint fk_facturas_clientes foreign key (id_cliente)
+references Clientes (id_cliente))
+
+create table Formas_Pagos(
+id_forma_pago int,
+forma_pago varchar(50) not null,
+constraint pk_formas_pagos primary key (id_forma_pago))
+
+create table Facturas_Formas_Pagos(
+id_factura_forma_pago int identity(1,1),
+id_forma_pago int,
+id_factura int,
+monto int,
+constraint pk_facturas_formas_pagos primary key (id_factura_forma_pago),
+constraint fk_facturas_formas_pagos_formas_pagos foreign key (id_forma_pago)
+references Formas_Pagos (id_forma_pago),
+constraint fk_facturas_formas_pagos_facturas foreign key (id_factura)
+references Facturas (id_factura))
+
+create table Detalles_Facturas(
+id_detalle_factura int,
+id_servicio int,
+id_profesional int,
+cantidad int,
+id_factura int,
+constraint pk_detalles_facturas primary key(id_detalle_factura),
+constraint fk_detalles_facturas_servicios foreign key (id_servicio)
+references Servicios(id_servicio),
+constraint fk_detalles_servicios_profesioales foreign key (id_profesional)
+references Profesionales (id_profesional),
+constraint fk_detalles_servicios_facturas foreign key (id_factura)
+references Facturas (id_factura))
+
+
+
+
+
+
+
+
+
+--Sentencias Insert:
+
+
+INSERT INTO PROVINCIAS(provincia)
+VALUES ('Córdoba'),
+('Buenos Aires'),
+('Mendoza'),
+('Corrientes'),
+('Jujuy'),
+('Santa Fe'),
+('Salta'),
+('Neuquén'),
+('San Luis'),
+('Misiones'),
+('La Rioja'),
+('La Pampa'),
+('Rio Negro'),
+('Formosa'),
+('Santa Cruz'),
+('Tierra del Fuego'),
+('Chaco'),
+('Entre Ríos'),
+('Chubut'),
+('San Juan'),
+('Catamarca'),
+('Tucuman'),
+('Santiago del Estero')
+
+
+INSERT INTO LOCALIDADES(localidad, id_provincia)
+VALUES ('Cordoba', 1),
+('Carlos Paz', 1),
+('Alta Gracia', 1),
+('Cosquín', 1),
+('La Plata', 2),
+('Villa Gesell', 2),
+('Bahia Blanca',2),
+('Ayacucho',2),
+('Mendoza', 3),
+('Godoy Cruz',3),
+('Guaymallen',3),
+('Colonia Suiza',3),
+('Corrientes', 4),
+('Bella Vista',4),
+('Bon Plan',4),
+('Chavarria',4),
+('San Salvador de Jujuy',5),
+('El Carmen',5),
+('El Talar',5),
+('Humahuaca',5),
+('Santa Fe', 6),
+('Arrufo',6),
+('Rosario',6),
+('Galvez',6),
+('Salta', 7),
+('Cafayate',7),
+('San Carlos',7),
+('Molinos',7),
+('Neuquen', 8),
+('Arroyito',8),
+('Centenario',8),
+('Copahue',8),
+('Merlo', 9),
+('La Punilla',9),
+('La Florida',9),
+('Rio Grande',9),
+('Posadas', 10),
+('Arroyo del Medio',10),
+('Apostoles',10),
+('Campo Grande',10),
+('La Rioja',11),
+('Chilecito',11),
+('Famatina',11),
+('Chamical',11),
+('Ciudad de Santa Rosa',12),
+('Ceballos',12),
+('Colonia Baron',12),
+('General San Martin',12),
+('Bariloche', 13),
+('El Bolson',13),
+('El Condor',13),
+('Mainque',13),
+('Formosa',14),
+('El Colorado',14),
+('General Manuel Belgrano',14),
+('Laguna Blanca',14),
+('Rio Gallegos',15),
+('Perito Moreno',15),
+('Pico Truncado',15),
+('Puerto San Julián',15),
+('Ushuaia', 16),
+('Laguna Escondida',16),
+('Río Grande',16),
+('Tolhuin',16),
+('Resistencia',17),
+('Campo Largo',17),
+('Colonia Elisa',17),
+('Charata',17),
+('Caceros',18),
+('Cerrito',18),
+('Aranguren',18),
+('Crespo',18),
+('Rawson',19),
+('Bahía Bustamante',19),
+('Camarones',19),
+('El Hoyo',19),
+('San Juan',20),
+('Rivadavia',20),
+('Santa Lucía',20),
+('Caucete',20),
+('San Fernando del Valle de Catamarca',21),
+('San Isidro',21),
+('Belen',21),
+('Recreo',21),
+('San Miguel de Tucuman',22),
+('Banda del Rio Sali',22),
+('Yerba Buena',22),
+('Villa Mariano Moreno',22),
+('Santiago del Estero',23),
+('La Banda',23),
+('Termas de Rio Hondo',23),
+('Añatuya',23)
+INSERT INTO BARRIOS(barrio, id_localidad)
+VALUES ('Centro', 1),
+('General Paz', 1),
+('Observatiorio',1),
+('Centro',2),
+('La Quinta ', 2),
+('Villa del Lago',2),
+('Centro', 3),
+('Pueyrredon', 3),
+('Centro', 4),
+('Alto mieres', 4),
+('Miguel Muños', 4),
+('Las Malvinas', 4),
+('Abasto', 5),
+('Olmos', 5),
+('Romero', 5),
+('Barrio Norte', 6),
+('Plazoleta Barrio', 6),
+('Barrio Bosque Alegre', 6),
+('Colon', 7),
+('Pacifico', 7),
+('El Nacional', 7),
+('Centro', 8),
+('Colon', 8),
+('Malvinas', 8),
+('Microcentro', 9),
+('Area Fundacional', 9),
+('Barrio Bombal', 9),
+('Centro', 10),
+('Villa del Parque', 10),
+('Las Tortugas', 10),
+('El Sauce', 11),
+('Los Corralitos', 11),
+('Kilometro 8', 11),
+('Centro', 12),
+('Belgrano', 12),
+('Barracas', 12),
+('San Geronimo', 13),
+('San Marcos', 13),
+('17 de Agosto', 13),
+('Barrio Villa Dolores', 14),
+('El Brete', 14),
+('Aeroclub ', 14),
+('Barrio Parque', 15),
+('Barrio concepcion', 15),
+('San Antonio', 15),
+('Centro', 16),
+('9 de Julio', 16),
+('Malvinas', 16),
+('San Martin', 17),
+('Belgrano', 17),
+('Suipacha', 17),
+('Belgrano', 18),
+('Sarmiento', 18),
+('Centro', 18),
+('Centro', 19),
+('Don Torcuato', 19),
+('General Pacheco', 19),
+('Barrio 2 de Abril', 20),
+('Barrio Santa Barbara', 20),
+('23 de Agosto', 20),
+('Centro', 21),
+('Oeste', 21),
+('Norte', 21),
+('Centro', 22),
+('Malvinas', 22),
+('b.Grande', 22),
+('Centro', 23),
+('Sarmiento', 23),
+('Belgrano', 23),
+('Tropezon', 24),
+('Urquiza', 24),
+('14 de Octrubre', 24),
+('Las Palmeras', 25),
+('Costa Azul', 25),
+('Los Olivos', 25),
+('Barrio Rivadavia', 26),
+('Barrio Matilde', 26),
+('Centro', 26),
+('Barrio San Carlos', 27),
+('Barrio Parque el Aybal', 27),
+('Barrio Miguel Arao', 27),
+('Centro', 28),
+('Sarmiento', 28),
+('Belgrano', 28),
+('Mariano Moreno', 29),
+('Villa Farrel', 29),
+('Rio Grande', 29),
+('Centro', 30),
+('Alberdi', 30),
+('Norte', 30),
+('Centro', 31),
+('Malvinas', 31),
+('Belgrano', 31),
+('Centro', 32),
+('norte', 32),
+('Crisol', 32),
+('Centro', 33),
+('Oeste', 33),
+('Alberdi', 33),
+('Barrio Los Eucaliptos', 34),
+('Barrio Los Lapachos', 34),
+('Barrio Los Nogales', 34),
+('Centro', 35),
+('San Antonio', 35),
+('Lagos', 35),
+('B. Danes', 36),
+('Chacre XI', 36),
+('Mutual', 36),
+('Alta Gracia', 37),
+('Bajada vieja', 37),
+('Belgrano', 37),
+('9 de Julio', 38),
+('Malvinas', 38),
+('2 de Abril', 38),
+('Barrio Carlos A ', 39),
+('Barrio Emilce E', 39),
+('Barrio Hector J', 39),
+('iprodhad', 40),
+('Centro', 40),
+('Sur', 40),
+('Alta Rioja', 41),
+('4 de Junio', 41),
+('San Vicente', 41),
+('Barrio Viviana R', 42),
+('Barrio Graciela del V', 42),
+('Barrio Edgardo J', 42),
+('Centro', 43),
+('Norte', 43),
+('Sur', 43),
+('Centro', 44),
+('Alberdi', 44),
+('Belgrano', 44),
+('Centro', 45),
+('41', 45),
+('El redondo', 45),
+('Centro', 46),
+('Norte', 46),
+('Cofico', 46),
+('Centro', 47),
+('Malvinas', 47),
+('Juan Pablo', 47),
+('Villa Ayacucho', 48),
+('Villa Ballester', 48),
+('Villa Chacabuco', 48),
+('Loteo Pagani', 49),
+('Valle Escondido', 49),
+('Don Bosco', 49),
+('General Enrique Godoy', 50),
+('General Fernández Oro', 50),
+('General Roca', 50),
+('Centro', 51),
+('Zona Sur', 51),
+('Alberdi', 51),
+('Centro', 52),
+('Alberdi', 52),
+('Malvinas', 52),
+('12 DE OCTUBRE', 53),
+('2 DE ABRIL', 53),
+('LA PAZ', 53),
+('Barrio AIDA E ', 54),
+('Julia E', 54),
+('Veronica V', 54),
+('Centro', 55),
+('Sur', 55),
+('Oeste', 55),
+('Centro', 56),
+('Cofico', 56),
+('La Loma', 56),
+('17 de octubre', 57),
+('2 de Abril', 57),
+('Centro', 57),
+('Los Pinos', 58),
+('Mutual', 58),
+('San Cayetano', 58),
+('Democracia', 59),
+('Industrial', 59),
+('Fonavi', 59),
+('Centro', 60),
+('Victor H', 60),
+('Eduardo', 60),
+('Centro', 61),
+('Oeste', 61),
+('Malvinas', 61),
+('Centro', 62),
+('Laguna escondida', 62),
+('Belgrano', 62),
+('Margen Sur', 63),
+('Chacras de la Margen Sur', 63),
+('AGP', 63),
+('Centro', 64),
+('3 de Febrero', 64),
+('Malvinas', 64),
+('Centro', 65),
+('Colon', 65),
+('Alberdi', 65),
+('Centro', 66),
+('Barrio Lomada', 66),
+('zona Sur', 66),
+('Centro', 67),
+('2 de Abril', 67),
+('Belgrano', 67),
+('Centro', 68),
+('Victor Arrudi', 68),
+('Malvinas', 68),
+('Centro', 69),
+('Alberdi', 69),
+('Malvinas', 69),
+('Centro', 70),
+('Alberdi', 70),
+('Malvinas', 70),
+('Ojibar', 71),
+('El Corso', 71),
+('Mendialde', 71),
+('Centro', 72),
+('Barrio Re', 72),
+('Alberdi', 72),
+('Justo Alsua', 73),
+('Los Hornitos', 73),
+('Mulcosur', 73),
+('Centro', 74),
+('Sur', 74),
+('2 de Abril', 74),
+('Centro', 75),
+('27 de Abril', 75),
+('Malvinas', 75),
+('El Álamo', 76),
+('El Faro', 76),
+('El Palmar', 76),
+('Barrio 15 de May', 77),
+('Barrio 17 de Octubre', 77),
+('Barrio 19 de Abril', 77),
+('Centro', 78),
+('Alberdi', 78),
+('3 de Febrero', 78),
+('Centro', 79),
+('4 de Febrero', 79),
+('27 de Abril', 79),
+('Centro', 80),
+('Zona Sur', 80),
+('Alberdi', 80),
+('Villa Cubas', 81),
+('Centro', 81),
+('Juan Manuel de Rosas', 81),
+('Centro', 82),
+('9 de Julio', 82),
+('Malvinas', 82),
+('Centro', 83),
+('Norte', 83),
+('Oeste', 83),
+('Centro', 84),
+('8 de Octubre', 84),
+('27 de Abril', 84),
+('Barrio Aeropuerto', 85),
+('Barrio Aconquija', 85),
+('Barrio Aguas Corrientes', 85),
+('Centro', 86),
+('Alberdi', 86),
+('Malvinas', 86),
+('Los Cerros', 87),
+('El tipai', 87),
+('Las Victorias', 87),
+('El Colmenar', 88),
+('Las Talitas', 88),
+('Tafi Viejo', 88),
+('Aeropuerto', 89),
+('General paz', 89),
+('Alberdi', 89),
+('Centro', 90),
+('San Fernando', 90),
+('Alberdi', 90),
+('Centro', 91),
+('General Paz', 91),
+('Alberdi', 91),
+('Centro', 92),
+('Malvinas', 92),
+('Belgrano', 92)
+
+
+INSERT INTO Generos(genero)
+VALUES ('Masculino'),
+('Femenino')
+
+
+INSERT INTO TIPOS_DOCUMENTOS(nombre_doc)
+VALUES ('DNI '),
+('Libreta Cívica'),
+('Pasaporte'),
+('Partida de nacimiento'),
+('Libreta de enrolamiento'),
+('Otros')
+
+
+
+
+INSERT INTO FORMAS_PAGOS (ID_FORMA_PAGO, FORMA_PAGO)
+VALUES(1,'EFECTIVO'),
+(2,'TRANSFERENCIA'),
+(3,'TARJETA CRÉDITO'),
+(4,'TARJETA DÉBITO'),
+(5,'CUENTA CORRIENTE')
+
+
+INSERT INTO TIPOS_FACTURAS ( ID_TIPO_FACTURA, TIPO_FACTURA)
+VALUES (1, 'FACTURA A'),
+(2, 'FACTURA B'),
+(3, 'FACTURA C'),
+(4, 'SIN COMPROBANTE')
+
+
+INSERT INTO TIPOS_SERVICIOS(ID_TIPO_SERVICIO, SERVICIO)
+VALUES (1,'PELUQUERIA'),
+(2,'TRATAMIENTOS FACIALES'),
+(3,'DEPILACION'),
+(4,'TRATAMIENTOS CORPORALES'),
+(5,'MANICURA'),
+(6,'PEDICURA'),
+(7,'BAÑOS'),
+(8,'SPA')
+
+
+SET DATEFORMAT 'DMY'
+
+
+INSERT INTO PROFESIONALES ( id_profesional, NOMBRE ,APELLIDO, fecha_nac,
+id_tipo_doc, nro_doc,PUESTO)
+VALUES (1, 'VALENTINA','GONZALEZ','21/06/2001',1, 40587996, 'PELUQUERIA'),
+(2, ' TOMAS','LOPEZ','07/02/1992',1,36578520,'PELUQUERIA'),
+(3, 'PEDRO', 'FUENTES','09/09/1988', 1, 33687112, 'MANICURISTA'),
+(4, 'ISABEL','RUIZ','02/11/1987',1, 33679241,'MANICURISTA'),
+(5, 'NICOLAS','PEREZ','25/10/1984',1, 26457895,'MASAJISTA'),
+(6, 'BEATRIZ','GONZALEZ','29/04/1991',1,31569443,'MASAJISTA'),
+(7, 'GABRIEL','RUIZ','23/12/1994',1,37895201,'ESTETICISTA'),
+(8, 'ANA','JUAREZ','17/07/2001',1,40597334,'ESTETICISTA'),
+(9, 'JOAQUIN','FONSI','12/03/2002',1,42659310,'MAQUILLADOR'),
+(10, 'MARIA JOSE','FLORES','21/02/1996',1,38965200,'MAQUILLADOR'),
+(11, ' LUCIA', 'SOSA','28/05/1989',1,33497550,'ESTETICISTA'),
+(12, 'MARIA', 'GUTIERREZ','06/08/2002',1,41256328,'MANICURISTA'),
+(13, 'MANUEL', 'BENITEZ','05/05/1997',1, 39583004,'MASAJISTA'),
+(14, 'EMMA', 'TORRES','19/03/1981', 1, 26987532,'ESTETICISTA'),
+(15, 'ALEJANDRO','DIAZ','14/11/2001', 1, 40269315,'PELUQUERIA'),
+(16, 'SUSANA','MARENGO','19/10/1992', 1, 37289127,'DEPILADORA') ,
+(17, 'RUTH','BELEN','01/04/2000', 1, 40368112,'DEPILADORA') ,
+(18, 'ANDREA','LAURAL','01/06/1990', 1, 33416981,'PEDICURA'),
+(19, 'FELICIA','SCHIAVONI','06/01/2002', 1, 42087174,'PEDICURA')
+
+
+
+
+INSERT INTO Clientes(id_cliente, id_genero, nombre, apellido, fecha_nac,
+id_tipo_doc, nro_doc, id_barrio, direccion, email)
+VALUES (0100, 1, 'Pepe', 'Argento','03/02/1977', 1, 20182341, 4,
+'Boulevard Sarmiento 1310', 'elpepe@hotmail.com'),
+(0160, 2, 'Monica', 'Argento','28/6/1979', 2, 23189531, 4, 'Boulevard
+Sarmiento 1310', 'moni2022@gmail.com'),
+(2998, 2, 'Andrea', 'Leguizamon','01/01/2003', 1, 43608921, 1, 'Cañada
+521', 'andreleguizamon1@gmail.com'),
+(8457, 2, 'Carmen',' Lopez','12/010/2003', 1, 44766235, 2, 'Colon 2644',
+'carmenlopez@hotmail.com'),
+(5558, 1, 'Maximo', 'Fiesta','20/03/1995', 1, 38316752 , 4, '9275 Tobias
+Yofre', 'maxifiesta@gmail.com'),
+(4556, 2, 'Esther', 'Beltran','13/09/1979', 1, 23105392, 5, '1144 Felix
+Frias', 'beltranesther@yahoo.com'),
+(6645, 2, 'Candela', 'Yapura','08/12/1977', 1, 20088149, 6, '781
+Hernandarias', 'cande_1998@hotmail.com'),
+(0254, 1, 'Raimundo', 'Toro','07/05/1991', 1, 36800460, 7, '2277 Paolo
+Guerrero', 'raitorito@gmail.com'),
+(1050, 2, 'Maria ', 'Portela','23/06/2004', 1, 46259949, 8, '612 Chubut',
+'mariporte@hotmail.com'),
+(0024, 2, 'Alma', 'Benito','29/01/2003', 1, 45433874, 9, '1914 Alem',
+'benito_alma@gmail.com'),
+(1056, 2, 'Marta', 'Espinosa','03/02/1988', 1, 29902882, 10, '365 Av
+Cordillera', 'marta35@gmail.com'),
+(4659, 2, 'Sheila', 'Martin','09/11/2002', 1, 44006216, 11, '6632 avenida
+fuerza aerea', 'sheilamartin12@hotmail.com'),
+(3698, 2, 'Alma', 'Lopez','04/02/2003', 1, 44600315, 12, '659 Sagrada
+Familia', 'Almita56@hotmail.com'),
+(6980, 1, 'Alejandro', 'Herrera','08/09/1980', 1, 26489038, 13, '52
+caseros',null),
+(5698, 2, 'Jesica', 'Lorente','03/02/1991', 1, 35494783, 14, '6259 27 de
+Abril', 'jesilorente@hotmail.com'),
+(1335, 2, 'Olga', 'Zangara','03/02/1989', 1, 32039368, 15, '753 Talleres',
+'olguitazangara25@gmail.com'),
+(1520, 2, 'Barbara', 'Perez','17/10/1993', 1, 36559898, 16, '1454 San
+Jerónimo', 'barbara-perezzz@gmail.com'),
+(1111, 2, 'Gisela', 'Cabrera','03/12/1993', 1, 36374903, 17, '1222
+Solares', 'gisela_0545@outlook.com'),
+(5487, 1, 'Noah', 'Lopez','26/01/1979', 1, 22316953, 18, '2150 Entre
+Rios', 'nonolop@outlook.com'),
+(6541, 2, 'Eugenia', 'Ordoñez','02/07/1989', 1, 29702061, 20, '152
+Belgrano', 'eugeorde2458@hotmail.com'),
+(2165, 1, 'Mauro', 'Mansilla','21/11/1986', 1, 27158436, 35, '3312 Obispo
+Trejos', 'Maur_allman@gmail.com'),
+(2269, 2, 'Dominga', 'Centeno','16/04/1978', 1, 21937555, 21, '1126
+Faustino Sarmiento', 'doming-centeno@outlook.com'),
+(2325, 2, 'Anabel', 'Zamora','29/07/1989', 1, 31485811, 55, '5376 ',
+null),
+(2433, 1, 'Miquel', 'Bernabeu','03/05/2005', 1, 48373358, 62, '2810
+Agustin Garzón', 'elmigue@hotmail.com'),
+(3489, 2, 'Erika', 'Mugas','01/02/1976', 2, 19477341, 81, '0884 Pablo
+Picasso', 'erikk4mu@outlook.com'),
+(4612, 1, 'Gael', 'Cardona','20/11/1990', 2, 35675277, 25, '3482 Agustin
+Garzón', 'gagacardo@hotmail.com'),
+(0987, 2, 'Mariana', 'Antolini','10/09/1990', 1, 32157558, 20, '62663
+Marquardt Expressway', 'supermarianto@hotmail.com'),
+(1856, 2, 'Maria Luz', 'Mayo','21/10/1984',2, 25337299 , 58, '0869
+Posadas', 'maaari2000@hotmail.com'),
+(1458, 2, 'Sonia', 'Sanchez','22/12/1982', 2, 23766416, 40, '3133 Obispo
+Trejos',null),
+(3010, 2, 'Adelaida', 'Florez','12/03/1980', 2, 21446984, 40, '2478 Obispo
+Trejos',null),
+(3156, 2, 'Clotilde', 'Carrasco','08/06/1991', 1, 35838823, 6, '0834
+Misiones', 'carrascocloti@hotmail.com'),
+(3248, 2, 'Amaya', 'López','17/02/2006', 1, 49607997, 8, '4509 Argandoña',
+'amalope@hotmail.com'),
+(3379, 2, 'Josefina ', 'Rivera','03/02/1994', 1, 37154109, 8, '4115
+Argandoña', 'josefirive54@gmaill.com'),
+(3741, 2, 'Clotilde', 'Nieto','01/12/1960', 2, 10982298, 21, '0115
+Sarmiento',null),
+(3514, 1, 'Francisco', 'Amaya','24/08/1980', 1, 21904791, 40, '3121 Groove
+Street',null),
+(3854, 2, 'Davinia', 'Candela','23/07/1979', 1, 20298301, 17, '1500 San
+Carlos Tejedor', 'davicande54@outlook.com'),
+(3799, 2, 'Maria Laura', 'Acevedo','22/04/2005', 1, 48308578, 4,
+'marilauri500@yahoo.com',null),
+(2745, 2, 'Nahir', 'Zamorano','15/08/1988', 1, 28688630, 18, '487 Los
+Ticas', 'nahiizamora@outlook.com'),
+(3245, 2, 'Milagros', 'Cabrera','16/08/1987', 1, 26087516, 6, '523
+Capdevila', 'milica@hotmail.com'),
+(1562, 2, 'Teresa', 'De Las Heras','01/06/1990', 1, 32026129, 15, '608
+Altamira ', 'tere_heras@outlook.com'),
+(1536, 1, 'Ezequiel', 'Gomez','13/10/1995', 1, 38592580, 1, '1891 Juan B
+Justo', 'eze_gomez@hotmail.com'),
+(4658, 2, 'Rafaela', 'Lopez','25/03/2005', 1, 45349933, 17, '7109
+Tucuman', 'rafiilopez@yahoo.com'),
+(4569, 2, 'Samara', 'Cuitiño','10/07/1990', 1, 30814112, 11, '6964 Sucre',
+'cuitiñosami@hotmail.com'),
+(4587, 2, 'Amanda', 'Gimenez','14/09/2005', 1, 47951754, 20, '62 Puerto
+Rico', '@amigime@hotmail.com'),
+(8765, 2, 'Sara ', 'Trivellini','20/01/1981', 1, 24119437, 2, '2519
+Jujuy', 'trivesara@outlook.com'),
+(8654, 1, 'Santiago', 'Correa','28/12/1988', 1, 28742931, 13, '5782
+Concejal Cabiche', 'saanticorr3a@hotmail.com'),
+(7546, 1, 'Luis', 'Manzanelli','10/08/1986', 1, 24946807, 10, '73257
+Candido Galvan', 'luiggimanzanelli@hotmail.com'),
+(7245, 2, 'Blanca', 'Rojo','21/04/2004', 1, 44947059, 17, '86 Cañada',
+'blanquirojo@outlook.com'),
+(3562, 2, 'Eliana', 'Garriga','04/05/1986', 1, 25942946, 16, '3856 Antonio
+del Viso', 'eligarriga@hotmail.com'),
+(4536, 1, 'Ignacio', 'Gutierrez','05/11/1983', 1, 21868326, 12, '88481
+Lavalleja', 'nachitoguti@outlook.com')
+
+
+
+
+insert into servicios (id_servicio,id_tipo_servicio,servicio,precio)
+VALUES (1, 1,'CORTE', 1000),
+(2, 1,'TINTURA', 2000),
+(3, 1,'PEINADO', 1500),
+(4, 1,'TRATAMIENTO CAPILAR', 5000),
+(5, 1,'LAVADO DE CABELLO', 800),
+(6, 1,'ALISADO', 1800),
+(7, 1,'REFLEJOS',1600),
+(8, 2,'LIMPIEZA FACIAL', 950),
+(9, 2,'MAQUILLAJE', 1700),
+(10, 2, 'GLITTER',1000),
+(11, 3,'DEPILACION FACIAL', 900),
+(12, 3,'DEPILACION CUERPO', 2500),
+(13, 4,'TRATAMIENTO ANTICELULITICO', 3500),
+(14, 4,'TRATAMIENTOS REDUCTORES', 3000),
+(15, 4, 'TRATAMIENTO DE REAFIRMACION', 3000),
+(16, 5,'MANICURIA SEMIPERMANTENTE', 16900),
+(17, 5,'MANICURIA KAPPING', 1200),
+(18, 5,'MANICURIA ESCULPIDAS', 1400),
+(19, 6,'TRATAMIENTO CONTRA HONGOS', 1300),
+(20, 6,'PEDICURA SEMIPERMANENTE', 1500),
+(21, 6,'PEDICURA TRADICIONAL', 1000),
+(22, 7,'BAÑOS DE SOL', 2000),
+(23, 7,'BAÑOS DE LUNA', 2000),
+(24, 8,'MASAJES', 1800),
+(25, 8,'MASAJES CON PIEDRAS', 2300),
+(26, 8,'MASAJES DESCONTRACTURANTES', 2000),
+(27, 8,'SESION SPA', 3500)
+
+
+
+
+INSERT INTO Facturas(id_factura, id_tipo_factura, fecha, numero_factura,
+id_cliente)
+VALUES(1202, 2, '10/03/2022', 01299123, 0100),
+(0333, 2, '07/10/2021', 00041111, 0160),
+(9005, 1, '11/02/2022', 00235513, 2998),
+(0101, 2, '03/09/2021', 29932939, 8457),
+(0013, 4, '10/01/2022', 20030391, 5558),
+(0192, 1, '28/04/2021', 00081200, 4556),
+(2225, 2, '10/08/2020', 02039393, 6645),
+(2107, 3, '13/01/2022', 00028217, 0254),
+(1003, 2, '12/01/2020', 02847847, 1050),
+(2908, 2, '17/04/2020', 00048811, 0024),
+(0222, 1, '17/10/2019', 00919283, 1056),
+(0111, 2, '22/05/2020', 00094413, 4659),
+(0044, 2, '28/02/2022', 00321134, 3698),
+(0021, 1, '08/04/2021', 00040123, 6980),
+(0218, 1, '01/03/2022', 00248211, 5698),
+(0026, 2, '01/03/2020', 00004912, 1335),
+(2324, 1, '17/04/2022', 01293934, 1520),
+(2012, 2, '02/02/2021', 00349912, 1111),
+(0030, 1, '14/10/2019', 00002113, 5487),
+(2001, 3, '05/12/2020', 00029314, 6541),
+(2020, 1, '12/11/2020', 00002134, 2165),
+(0217, 2, '10/02/2021', 00000166, 2269),
+(9922, 2, '09/02/2020', 00129331, 2325),
+(1412, 4, '22/01/2021', 00022214, 2433),
+(9002, 2, '11/12/2021', 00023911, 3489),
+(2112, 2, '23/05/2021', 00000551, 4612),
+(4454, 1, '17/03/2021', 00019201, 0987),
+(7667, 3, '25/04/2022', 00000848, 1856),
+(2018, 2, '17/03/2022', 12984573, 1458),
+(9985, 1, '11/05/2022', 01292875, 3010),
+(2727, 2, '12/07/2020', 00005129, 3156),
+(1173, 4, '20/09/2021', 00093881, 3248),
+(2103, 3, '20/04/2021', 00012960, 3379),
+(6758, 2, '27/01/2022', 00109283, 3741),
+(1855, 2, '09/11/2019', 00000981, 3514),
+(0102, 4, '24/08/2020', 00923771, 3854),
+(1225, 1, '09/08/2020', 00047712, 3799),
+(2100, 2, '10/10/2021', 00009381, 2745),
+(1254, 1, '22/12/2019', 00048123, 3245),
+(1887, 2, '20/01/2021', 00028193, 1562),
+(2900, 1, '14/02/2021', 00004712, 1536),
+(9087, 2, '21/01/2020', 00000127, 4658),
+(4446, 2, '09/11/2019', 00278171, 4569),
+(9086, 3, '04/01/2021', 00098721, 4587),
+(1239, 1, '11/03/2021', 00009812, 8765),
+(8926, 2, '21/05/2020', 00002784, 8654),
+(1452, 1, '22/07/2019', 00007891, 7546),
+(5821, 4, '12/01/2020', 00008951, 7245),
+(1333, 1, '02/05/2019', 00001729, 3562),
+(5673, 2, '31/03/2020', 00052316, 4536)
+
+
+
+insert into Facturas_Formas_Pagos(id_factura, id_forma_pago,monto)
+VALUES (1202, 1, 1700),
+(0333, 2, 950),
+(9005,3 , 2000),
+(0101,4 ,900),
+(0013,5 ,900),
+(0192, 1,800),
+(2225, 1,9000),
+(2107, 1,2000),
+(1003, 1,1000),
+(2908, 2, 4000),
+(0222, 5, 1700),
+(0111, 3, 950),
+(0044, 4, 1600),
+(0021, 2, 1000),
+(0218, 4, 3000),
+(0026, 1, 1000),
+(2324, 1, 3500),
+(2012, 5, 1200),
+(0030, 2, 2500),
+(2001, 2, 2000),
+(2020, 4, 900),
+(0217, 1, 1500),
+(0217, 3, 1500),
+(9922,2, 3000),
+(1412, 3, 1700),
+(9002, 1, 900),
+(9002, 2, 900),
+(2112, 4, 1200),
+(4454, 4, 1400),
+(7667, 1, 900),
+(2018,2, 5000),
+(9985, 3, 950),
+(2727, 4, 2000),
+(1173, 1, 1500),
+(2103, 2 , 3400),
+(6758, 3, 950),
+(1855,1,900),
+(0102,2,1800),
+(1225, 4,1200),
+(2100, 3,2000),
+(1254, 1, 1400),
+(1887, 2, 4600),
+(2900, 3, 5000),
+(9087, 4, 2000),
+(4446, 1, 800),
+(9086, 2, 1300),
+(1239, 3, 7000),
+(8926, 4, 1700),
+(1452, 1, 1000),
+(5821, 2, 1000),
+(1333, 3, 9200)
+
+
+
+INSERT INTO Detalles_Facturas(id_detalle_factura, id_servicio, id_profesional,
+cantidad, id_factura)
+VALUES (9001, 22, 13, 2,2908),
+(0009, 9, 9, 1, 0222),
+(9499, 8, 14, 1, 0111),
+(2333, 5, 15, 2, 0044),
+(2130, 10, 7, 1, 0021),
+(1245, 15, 8, 1, 0218),
+(7644, 21, 19, 1, 0026),
+(1266, 13, 10, 1, 2324),
+(9200, 17, 4, 1, 2012),
+(1012, 12, 16, 1, 0030),
+(0828, 26, 5, 1, 2001),
+(5662, 11, 17, 1, 2020),
+(7581, 14, 7, 1, 0217),
+(8000, 15, 8, 1, 9922),
+(2602, 9, 9, 1, 1412),
+(5554, 6, 2, 1, 9002),
+(1723, 17, 3, 1, 2112),
+(1988, 18, 12, 1, 4454),
+(6545, 16, 4, 1, 7667),
+(2111, 4, 1, 1, 2018),
+(9887, 8, 9, 1, 9985),
+(1105, 10, 10, 2, 2727),
+(0938, 9, 7, 2, 2103),
+(0171, 8, 9, 1, 6758),
+(1237, 16, 12, 1, 1855),
+(0092, 11, 17, 1, 1225),
+(2991, 22, 13, 1, 2100),
+(0992, 18, 12, 1, 1254),
+(9981, 25, 6, 2, 1887),
+(1908, 4, 2, 1, 2900),
+(0012, 10, 9, 2, 9087),
+(0192, 5, 15, 1, 4446),
+(5664, 19, 19, 1, 9086),
+(6572, 27, 5, 2, 1239),
+(2227, 9, 8, 1, 8926),
+(1241, 21, 18, 1, 1452),
+(1554, 1, 2, 1, 5821),
+(5871, 7, 1, 2, 1333),
+(8347, 15, 8, 2, 1333),
+(9764, 9, 10, 1, 1202),
+(1122, 8, 9, 1, 0333),
+(0087, 2, 2, 1, 9005),
+(0840, 11, 16,1, 0101),
+(1188, 16, 17,1, 0013),
+(0881, 18, 3,1, 0192),
+(0014, 14, 7,3, 2225),
+(1100, 26, 13,1, 2107),
+(9996, 21, 18, 1, 1003),
+(1909, 6, 15, 1, 0102),
+(0180, 20, 19, 1, 1173)
+
+
+
+
+
+
+
+-- CONSULTAS
+
+
+/*--
+Se lista a los clientes donde su edad está comprendida entre los 18 y 40 años,
+cuyo consumo es del servicio "Peluquería" y el monto del mismo supera los $800,
+y que son atendidos por profesionales mayores a 21 años. Ordenados por número de
+factura más reciente
+--*/
+
+select c.apellido + space(1) + c.nombre 'Apellido y Nombre',
+datediff(YEAR,c.fecha_nac,getdate()) 'Edad',f.numero_factura 'Número de
+Factura',p.nombre 'Profesional',
+p.puesto 'Puesto', s.servicio 'Servicio Prestado', s.precio 'Monto por Orden'
+,df.cantidad 'Número de Orden'
+from Clientes c
+inner join Facturas f on c.id_cliente=f.Id_cliente
+inner join Detalles_Facturas df on f.id_factura=df.id_factura
+inner join Servicios s on df.id_servicio=s.id_servicio
+inner join Profesionales p on df.id_profesional=p.id_profesional
+where datediff(year,c.fecha_nac,getdate()) >= 18 
+and datediff(year,p.fecha_nac,getdate()) <= 40
+and p.puesto='PELUQUERIA'
+and s.precio > 800
+and datediff(year,p.fecha_nac,getdate()) > 21
+order by [Número de Factura] desc
+
+
+
+/*--
+se desea listar a los clientes mayores de 21 años y oriundos de las provincias de
+Córdoba y Buenos Aires con su respectiva factura emitida entre el año 2021 y el
+2022, solo aquellos que hayan abonado con tarjeta de crédito o de débito.
+Ordenado por Monto, de mayor a menor.
+--*/
+select c.nombre + space(1) + c.apellido 'Nombre y Apellido',
+datediff(year,c.fecha_nac,getdate()) 'Edad', l.localidad + ', ' + p.provincia
+'Localidad y Provincia',
+f.numero_factura 'Factura',mp.forma_pago 'Medio de pago', fp.monto 'Monto'
+from clientes c
+inner join barrios b on c.id_barrio=b.id_barrio
+inner join localidades l on b.id_localidad=l.id_localidad
+inner join provincias p on l.id_provincia=p.id_provincia
+inner join facturas f on c.id_cliente=f.id_cliente
+inner join Facturas_Formas_Pagos fp on f.id_factura=fp.id_factura
+inner join Formas_Pagos mp on fp.id_forma_pago=mp.id_forma_pago
+where datediff(year,c.fecha_nac,getdate()) > 21
+and p.provincia in ('Córdoba', 'Buenos Aires')
+and year(f.fecha) between 2021 and 2022
+and mp.forma_pago in ('TARJETA CRÉDITO', 'TARJETA DÉBITO')
+order by [Monto] desc

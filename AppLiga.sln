@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppLiga", "AppLiga.csproj", "{FCCDB44C-88CB-4BF4-9419-7D213A8838A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FCCDB44C-88CB-4BF4-9419-7D213A8838A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCCDB44C-88CB-4BF4-9419-7D213A8838A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCCDB44C-88CB-4BF4-9419-7D213A8838A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCCDB44C-88CB-4BF4-9419-7D213A8838A4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {775A4B8B-EBC2-43B0-A4DA-7D73555676CE}
+	EndGlobalSection
+EndGlobal
